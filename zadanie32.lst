@@ -1,0 +1,88 @@
+Microsoft (R) Macro Assembler Version 14.27.29112.0	    10/12/21 15:17:23
+zadanie32.asm						     Page 1 - 1
+
+
+				; program przykładowy (wersja 32-bitowa)
+				.686
+				.model flat
+				extern _ExitProcess@4 : PROC
+				extern __write : PROC ; (dwa znaki podkreślenia)
+				public _main
+ 00000000			.data
+ 00000000 0A 4E 61 7A 79	tekst 	db 10, 'Nazywam sie . . . ' , 10
+	   77 61 6D 20 73
+	   69 65 20 2E 20
+	   2E 20 2E 20 0A
+ 00000014  4D 6F 6A 20 70		db 'Moj pierwszy 32-bitowy program '
+	   69 65 72 77 73
+	   7A 79 20 33 32
+	   2D 62 69 74 6F
+	   77 79 20 70 72
+	   6F 67 72 61 6D
+	   20
+ 00000033  61 73 65 6D 62		db 'asemblerowy dziala juz poprawnie!', 10
+	   6C 65 72 6F 77
+	   79 20 64 7A 69
+	   61 6C 61 20 6A
+	   75 7A 20 70 6F
+	   70 72 61 77 6E
+	   69 65 21 0A
+ 00000000			.code
+ 00000000			_main PROC
+ 00000000  B9 00000055			mov 	ecx, 85 		; liczba znaków wyświetlanego tekstu
+
+				; wywołanie funkcji ”write” z biblioteki języka C
+ 00000005  51				push 	ecx 			; liczba znaków wyświetlanego tekstu
+ 00000006  68 00000000 R		push 	dword PTR OFFSET tekst 	; położenie obszaru
+									; ze znakami
+ 0000000B  68 00000001			push 	dword PTR 1 		; uchwyt urządzenia wyjściowego
+ 00000010  E8 00000000 E		call 	__write 		; wyświetlenie znaków
+									; (dwa znaki podkreślenia _ )
+ 00000015  83 C4 0C			add 	esp, 12 		; usunięcie parametrów ze stosu
+
+				; zakończenie wykonywania programu
+ 00000018  68 00000000			push 	dword PTR 0 		; kod powrotu programu
+ 0000001D  E8 00000000 E		call 	_ExitProcess@4
+ 00000022			_main ENDP
+				END
+Microsoft (R) Macro Assembler Version 14.27.29112.0	    10/12/21 15:17:23
+zadanie32.asm						     Symbols 2 - 1
+
+
+
+
+Segments and Groups:
+
+                N a m e                 Size     Length   Align   Combine Class
+
+FLAT . . . . . . . . . . . . . .	GROUP
+_DATA  . . . . . . . . . . . . .	32 Bit	 00000055 Para	  Public  'DATA'	
+_TEXT  . . . . . . . . . . . . .	32 Bit	 00000022 Para	  Public  'CODE'	
+
+
+Procedures, parameters, and locals:
+
+                N a m e                 Type     Value    Attr
+
+_main  . . . . . . . . . . . . .	P Near	 00000000 _TEXT	Length= 00000022 Public
+
+
+Symbols:
+
+                N a m e                 Type     Value    Attr
+
+@CodeSize  . . . . . . . . . . .	Number	 00000000h   
+@DataSize  . . . . . . . . . . .	Number	 00000000h   
+@Interface . . . . . . . . . . .	Number	 00000000h   
+@Model . . . . . . . . . . . . .	Number	 00000007h   
+@code  . . . . . . . . . . . . .	Text   	 _TEXT
+@data  . . . . . . . . . . . . .	Text   	 FLAT
+@fardata?  . . . . . . . . . . .	Text   	 FLAT
+@fardata . . . . . . . . . . . .	Text   	 FLAT
+@stack . . . . . . . . . . . . .	Text   	 FLAT
+_ExitProcess@4 . . . . . . . . .	L Near	 00000000 FLAT	External
+__write  . . . . . . . . . . . .	L Near	 00000000 FLAT	External
+tekst  . . . . . . . . . . . . .	Byte	 00000000 _DATA	
+
+	   0 Warnings
+	   0 Errors
