@@ -3,6 +3,7 @@
 
 extern _ExitProcess@4 : proc
 extern __write : proc
+extern __read : proc
 
 public _main
 
@@ -10,7 +11,8 @@ public _main
 
 znaki_eax db 12 dup (?)
 
-elem dd ?
+obszar db 12 dup (?) ; 12 znaków
+dziesiec dd 10 ; mno¿nik
 
 .code
 
@@ -55,8 +57,9 @@ wyswietl:
 	ret
 wyswietl_EAX endp
 
-_main proc
-	
+ciag proc
+	pusha
+
 	mov esi, 1 ; ustaw esi na 1
 	pierwsze_50:
 
@@ -69,12 +72,71 @@ _main proc
 	mov ecx, 2
 	div	ecx ; policz (eax^2 - eax + 2)/2
 
-	call wyswietl_EAX
+	call wyswietl_EAX ; wyswietl wynik obliczen
 
 	inc esi
 	cmp esi, 51
 	jne pierwsze_50 ; powtarzaj dopoki esi nie jest 50
 
+	popa
+	ret
+ciag endp
+
+wczytaj_do_eax proc
+	push ebx
+	push ecx
+	push edx
+	push esi
+	push edi
+
+
+	; max iloœæ znaków wczytywanej liczby
+	push dword PTR 12
+	push dword PTR OFFSET obszar ; adres obszaru pamiêci
+	push dword PTR 0; numer urz¹dzenia (0 dla klawiatury)
+	call __read ; odczytywanie znaków z klawiatury
+				;(dwa znaki podkreœlenia przed read)
+	add esp, 12 ; usuniêcie parametrów ze stosu
+
+; bie¿¹ca wartoœæ przekszta³canej liczby przechowywana jest
+; w rejestrze EAX; przyjmujemy 0 jako wartoœæ pocz¹tkow¹
+	mov eax, 0
+	mov ebx, OFFSET obszar ; adres obszaru ze znakami
+pobieraj_znaki:
+	xor ecx, ecx
+	mov cl, [ebx]	; pobranie kolejnej cyfry w kodzie
+					; ASCII
+	inc ebx		; zwiêkszenie indeksu
+	cmp cl,10	; sprawdzenie czy naciœniêto Enter
+	je byl_enter	; skok, gdy naciœniêto Enter
+
+	
+	sub cl, 30H ; zamiana kodu ASCII na wartoœæ cyfry
+	movzx ecx, cl ; przechowanie wartoœci cyfry wrejestrze ECX
+
+		; mno¿enie wczeœniej obliczonej wartoœci razy 10
+	mul dword PTR dziesiec
+	add eax, ecx ; dodanie ostatnio odczytanej cyfry
+	jmp pobieraj_znaki ; skok na pocz¹tek pêtli
+byl_enter:
+; wartoœæ binarna wprowadzonej liczby znajduje siê teraz w 
+
+
+	pop ebx
+	pop ecx
+	pop edx
+	pop esi
+	pop edi
+	ret
+wczytaj_do_eax endp
+
+_main proc
+	
+	call wczytaj_do_eax
+
+	or eax, eax
+
+	call wyswietl_EAX	
 
 	push	0
 	call _ExitProcess@4
